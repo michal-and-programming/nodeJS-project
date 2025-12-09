@@ -3,12 +3,15 @@ import {
   Get,
   Param,
   Delete,
-  NotFoundException,
   Post,
+  NotFoundException,
   Body,
+  ParseUUIDPipe,
+  Put,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import type { CreateProductDTO } from './dtos/create-product.dto';
+import type { UpdateProductDTO } from './dtos/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -19,11 +22,11 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
-  @Get(':id')
-  getOne(@Param('id') id: string) {
-    const product = this.productsService.findOne(id);
-    if (!product) throw new NotFoundException('Product not found');
-    return product;
+  @Get('/:id')
+  getById(@Param('id', new ParseUUIDPipe()) id: string) {
+    const prod = this.productsService.getById(id);
+    if (!prod) throw new NotFoundException('Product not found');
+    return prod;
   }
 
   @Post('/')
@@ -31,10 +34,23 @@ export class ProductsController {
     return this.productsService.create(productData);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    const ok = this.productsService.remove(id);
-    if (!ok) throw new NotFoundException('Product not found');
-    return { deleted: true };
+  @Put('/:id')
+  update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() productData: UpdateProductDTO,
+  ) {
+    if (!this.productsService.getById(id))
+      throw new NotFoundException('Product not found');
+
+    this.productsService.updateById(id, productData);
+    return { success: true };
+  }
+
+  @Delete('/:id')
+  deleteById(@Param('id', new ParseUUIDPipe()) id: string) {
+    if (!this.productsService.getById(id))
+    throw new NotFoundException('Product not found');
+    this.productsService.deleteById(id);
+    return { success: true };
   }
 }
