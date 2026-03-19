@@ -4,12 +4,10 @@ export class CreateOrderDTO {
   @IsNotEmpty()
   @IsString()
   @IsUUID()
-  @Length(10, 40)
   productId: string;
 
   @IsNotEmpty()
   @IsString()
   @IsUUID()
-  @Length(10, 40)
   clientId: string;
 }

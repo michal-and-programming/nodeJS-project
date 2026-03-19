@@ -60,43 +60,36 @@ function getOrders() {
   return [
     {
       id: 'fd105551-0f0d-4a9f-bc41-c559c8a17260',
-      client: 'John Doe',
-      address: '123 Main Street, London',
       productId: 'fd105551-0f0d-4a9f-bc41-c559c8a17256',
+      clientId: '11111111-1111-1111-1111-111111111111',
     },
     {
       id: 'fd105551-0f0d-4a9f-bc41-c559c8a17261',
-      client: 'Jane Doe',
-      address: '123 Main Street, London',
       productId: 'fd105551-0f0d-4a9f-bc41-c559c8a17256',
+      clientId: '22222222-2222-2222-2222-222222222222',
     },
     {
       id: 'fd105551-0f0d-4a9f-bc41-c559c8a17262',
-      client: 'Thomas Jefferson',
-      address: 'Baker Street 12B, New York',
       productId: '01c7599d-318b-4b9f-baf7-51f3a936a2d4',
+      clientId: '33333333-3333-3333-3333-333333333333',
     },
   ];
 }
 
 async function seed() {
   await Promise.all(
-    getProducts().map((product) => {
-      return db.product.create({ data: product });
-    }),
+    getProducts().map((product) => db.product.create({ data: product })),
   );
 
   await Promise.all(
-    getClients().map((client) => {
-      return db.client.create({ data: client }),
-    }),
+    getClients().map((client) => db.client.create({ data: client })),
   );
 
   await Promise.all(
-    getOrders().map(({ productId, clientId, ...order }) =>
+    getOrders().map(({ productId, clientId, id }) =>
       db.order.create({
         data: {
-          ...order,
+          id,
           product: {
             connect: { id: productId },
           },
@@ -109,4 +102,11 @@ async function seed() {
   );
 }
 
-seed();
+seed()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await db.$disconnect();
+  });

@@ -8,7 +8,7 @@ import type { UpdateOrderDTO } from './dtos/update-order.dto';
 export class OrdersService {
   constructor(private prismaService: PrismaService) {}
 
-  public findAll(): Promise<Order[]> {
+  public findAll(): Promise<any[]> {
     return this.prismaService.order.findMany({
       include: {
         product: true,
